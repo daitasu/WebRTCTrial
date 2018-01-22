@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Camera with mediaDevice</title>
+</head>
+<body style="text-align: center">
+<button onclick="startVideo()">Start</button>
+<button onclick="stopVideo()">Stop</button>
+<br>
+<table align="center">
+    <tr>
+        <td>通常</td>
+        <td>反転</td>
+    </tr>
+    <tr>
+        <td><video id="local_video" autoplay style="width: 320px; height: 240px; border: 1px solid black;"></video></td>
+        <td><video id="flip_video" autoplay style="transform: scaleX(-1); width: 320px; height: 240px; border: 1px solid black;"></video></td>
+    </tr>
+</table>
+<table align="center">
+    <tr>
+        <td>角丸</td>
+        <td>セピア</td>
+    </tr>
+    <tr>
+        <td><video id="round_video" autoplay style="border-radius: 80px 80px 80px 80px; width: 320px; height: 240px; border: 1px solid black;"></video></td>
+        <td><video id="filter_video" autoplay style="filter: sepia(100%); -webkit-filter: sepia(100%); width: 320px; height: 240px; border: 1px solid black;"></video></td>
+    </tr>
+</table>
+
+</body>
+
+<script type="text/javascript">
+    let localVideo = document.getElementById('local_video');
+    let flipVideo = document.getElementById('flip_video');
+    let roundVideo = document.getElementById('round_video');
+    let filterVideo = document.getElementById('filter_video');
+
+    let localStream;
+
+    // start local video
+    function startVideo() {
+        navigator.mediaDevices.getUserMedia({video: true, audio: false})
+            .then(function (stream) { // success
+                localStream = stream;
+                localVideo.src = window.URL.createObjectURL(localStream);
+                flipVideo.src = window.URL.createObjectURL(localStream);
+                roundVideo.src = window.URL.createObjectURL(localStream);
+                filterVideo.src = window.URL.createObjectURL(localStream);
+
+            }).catch(function (error) { // error
+            console.error('mediaDevice.getUserMedia() error:', error);
+            return;
+        });
+    }
+
+    // stop local video
+    function stopVideo() {
+        for (track of localStream.getTracks()) {
+            track.stop();
+        }
+        localStream = null;
+
+        localVideo.pause();
+        window.URL.revokeObjectURL(localVideo.src);
+        localVideo.src = '';
+    }
+</script>
+</html>
